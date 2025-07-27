@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search you City</title>
+  <style>
+    /* Fundo com a imagem do wallpaper indicado */
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url("https://wallpapercave.com/wp/wp8324687.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    /* Caixa principal meio opaca */
+    .container {
+      background: rgba(0,0,0,0.6); /* preto com opacidade 60% */
+      max-width: 700px;
+      width: 100%;
+      border-radius: 10px;
+      padding: 20px;
+      box-sizing: border-box;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+    }
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 15px;
+    }
+    input {
+      width: 75%;
+      margin-right: 5px;
+    }
+    button {
+      background-color: #2196f3;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1976d2;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section h2 {
+      border-bottom: 1px solid #555;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .weather-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      flex: 1 1 120px;
+      box-sizing: border-box;
+    }
+    .weather-card img {
+      width: 50px;
+      height: 50px;
+    }
+    .scrollable {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Previsão do Tempo</h1>
+    <input id="cidade-input" type="text" placeholder="Ex: Recife" />
+    <button onclick="buscarTudo()">Buscar</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    const chave = "c2e74e9ad5d910d7889b155c09a0d42d";
+
+    async function buscarTudo() {
+      const cidade = document.getElementById("cidade-input").value.trim();
+      if (!cidade) {
+        alert("Por favor, digite uma cidade.");
+        return;
+      }
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "<p>Carregando...</p>";
+
+      try {
+        // 1. Geocoding - pega lat/lon da cidade
+        const geoRes = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cidade)}&limit=1&appid=${chave}`);
+        const geoData = await geoRes.json();
+        if (!geoData.length) {
+          resultado.innerHTML = `<p>Cidade não encontrada.</p>`;
+          return;
+        }
+        const { lat, lon, name, state, country } = geoData[0];
+
+        // 2. Dados atuais (/weather)
+        const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${chave}&units=metric&lang=pt_br`);
+        const weather = await weatherRes.json();
+
+        // 3. Previsão 5 dias / 3h (/forecast)
+        const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${chave}&units=metric&lang=pt_br`);
+        const forecast = await forecastRes.json();
+
+        // 4. Qualidade do ar (/air_pollution)
+        const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${chave}`);
+        const air = await airRes.json();
+
+        // Montar HTML
+        let html = `<div class="section">
+          <h2>Localização</h2>
+          <p><strong>${name}${state ? ", " + state : ""}, ${country}</strong></p>
+          <p>Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}</p>
+        </div>`;
+
+        html += `<div class="section">
+          <h2>Tempo Atual</h2>
+          <div class="flex-row">
+            <div class="weather-card">
+              <h3>${weather.weather[0].description}</h3>
+              <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png" alt="${weather.weather[0].description}" />
+            </div>
+            <div class="weather-card"><strong>Temperatura:</strong> ${Math.round(weather.main.temp)} °C</div>
+            <div class="weather-card"><strong>Sensação térmica:</strong> ${Math.round(weather.main.feels_like)} °C</div>
+            <div class="weather-card"><strong>Mínima:</strong> ${Math.round(weather.main.temp_min)} °C</div>
+            <div class="weather-card"><strong>Máxima:</strong> ${Math.round(weather.main.temp_max)} °C</div>
+            <div class="weather-card"><strong>Umidade:</strong> ${weather.main.humidity} %</div>
+            <div class="weather-card"><strong>Vento:</strong> ${Math.round(weather.wind.speed * 3.6)} km/h</div>
+            <div class="weather-card"><strong>Pressão:</strong> ${weather.main.pressure} hPa</div>
+          </div>
+        </div>`;
+
+        html += `<div class="section">
+          <h2>Qualidade do Ar</h2>`;
+        if (air.list && air.list.length > 0) {
+          const a = air.list[0];
+          html += `<div class="flex-row">
+            <div class="weather-card"><strong>Índice AQI:</strong> ${a.main.aqi} (1-5)</div>
+            <div class="weather-card"><strong>CO:</strong> ${a.components.co} μg/m³</div>
+            <div class="weather-card"><strong>NO:</strong> ${a.components.no} μg/m³</div>
+            <div class="weather-card"><strong>NO₂:</strong> ${a.components.no2} μg/m³</div>
+            <div class="weather-card"><strong>O₃:</strong> ${a.components.o3} μg/m³</div>
+            <div class="weather-card"><strong>SO₂:</strong> ${a.components.so2} μg/m³</div>
+            <div class="weather-card"><strong>PM2.5:</strong> ${a.components.pm2_5} μg/m³</div>
+            <div class="weather-card"><strong>PM10:</strong> ${a.components.pm10} μg/m³</div>
+          </div>`;
+        } else {
+          html += "<p>Dados de qualidade do ar não disponíveis.</p>";
+        }
+        html += "</div>";
+
+        // Forecast: mostrar 5 primeiros horários da previsão
+        html += `<div class="section">
+          <h2>Previsão para 5 dias (3 em 3 horas)</h2>
+          <div class="scrollable">`;
+        const previsoes = forecast.list.slice(0, 15);
+        for (const item of previsoes) {
+          const dt = new Date(item.dt * 1000);
+          html += `<div class="weather-card" style="margin-bottom:10px;">
+            <strong>${dt.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</strong><br />
+            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" />
+            <br />
+            ${item.weather[0].description}<br />
+            Temp: ${Math.round(item.main.temp)} °C<br />
+            Sensação: ${Math.round(item.main.feels_like)} °C<br />
+            Umidade: ${item.main.humidity} %<br />
+            Vento: ${Math.round(item.wind.speed * 3.6)} km/h
+          </div>`;
+        }
+        html += `</div></div>`;
+
+        resultado.innerHTML = html;
+      } catch (e) {
+        console.error(e);
+        resultado.innerHTML = `<p>Erro ao buscar dados. Tente novamente.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
