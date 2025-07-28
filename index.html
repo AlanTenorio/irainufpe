@@ -2,127 +2,285 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Search your City</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Previsão do Tempo - Responsivo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    /* Reset e fonte */
     * {
       font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
-      background-image: url("https://wallpapercave.com/wp/wp8324687.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-image: url('./paisagem-natural.png');
+      background-size: cover;       /* cobre toda a tela */
+      background-position: center;  /* centraliza a imagem */
+      background-repeat: no-repeat; /* não repete */
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 20px;
-      color: #fff;
+      padding: 40px 15px 20px;
+      color: #f0f4ff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-y: scroll;
     }
 
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      max-width: 800px;
+
+    #container {
+      background: rgba(255 255 255 / 0.12);
+      max-width: 900px;
       width: 100%;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
+      border-radius: 25px;
+      padding: 30px 40px;
+      box-shadow: 0 12px 30px rgb(0 0 0 / 0.35);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.4s ease;
     }
 
-    h1, h2, h3 {
-      color: #fff;
+    #container:hover {
+      background: rgba(255 255 255 / 0.16);
     }
 
-    input, button {
-      font-size: 16px;
-      padding: 10px;
-      border-radius: 10px;
+    #search {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 700px;
+      margin-bottom: 35px;
+      flex-wrap: wrap;
+    }
+
+    #search input {
+      flex-grow: 1;
+      min-width: 200px;
+      padding: 14px 20px;
+      font-size: 18px;
+      border-radius: 14px;
       border: none;
-      margin-bottom: 15px;
+      background: rgba(255 255 255 / 0.9);
+      color: #1e293b;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+      transition: box-shadow 0.3s ease, background-color 0.3s ease;
+      min-width: 0;
     }
 
-    input {
-      width: 70%;
-      margin-right: 5px;
-      border: 1px solid #ccc;
+    #search input::placeholder {
+      color: #64748b;
+      font-weight: 400;
     }
 
-    button {
-      background-color: #4a7dff;
-      color: white;
-      margin-left: 5%;
+    #search input:focus-visible {
+      outline: none;
+      box-shadow: 0 0 10px #60a5fa;
+      background: #fff;
+      color: #111827;
+    }
+
+    #search button {
+      padding: 14px 30px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 14px;
+      border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 6px 16px rgb(37 99 235 / 0.65);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      min-width: 140px;
     }
 
-    button:hover {
-      background-color: #375edc;
+    #search button:hover,
+    #search button:focus-visible {
+      background: #1d4ed8;
+      box-shadow: 0 8px 20px rgb(29 78 216 / 0.8);
+      outline-offset: 4px;
+      outline: 2px solid #3b82f6;
     }
 
     .section {
-      margin-bottom: 25px;
+      width: 100%;
+      margin-bottom: 35px;
     }
 
     .section h2 {
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
-      color: #ffe;
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #e0e7ff;
+      text-shadow: 0 1px 5px rgb(0 0 0 / 0.3);
     }
 
     .flex-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 20px;
+      justify-content: center;
     }
 
     .weather-card {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      margin-bottom: 15px;
-      padding: 15px;
-      flex: 1 1 140px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-      color: #fff;
-      backdrop-filter: blur(4px);
+      margin-top: 4px;
+      background: rgba(255 255 255 / 0.2);
+      border-radius: 16px;
+      padding: 20px 25px;
+      flex: 1 1 160px;
+      box-shadow: 0 4px 20px rgb(0 0 0 / 0.12);
+      color: #f0f4ff;
+      backdrop-filter: blur(8px);
+      text-align: center;
+      font-weight: 600;
+      user-select: none;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      min-width: 200px;
+    }
+
+    .weather-card:hover {
+      background: rgba(255 255 255 / 0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 8px 30px rgb(0 0 0 / 0.25);
     }
 
     .weather-card img {
-      width: 50px;
-      height: 50px;
-      display: block;
-      margin-bottom: 10px;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 12px;
+      filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.35));
     }
 
     .scrollable {
-      max-height: 250px;
+      max-height: 270px;
       overflow-y: auto;
-      padding-right: 10px;
+      padding-right: 12px;
+      border-radius: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #4a7dff transparent;
+    }
+    .scrollable::-webkit-scrollbar {
+      width: 8px;
+    }
+    .scrollable::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .scrollable::-webkit-scrollbar-thumb {
+      background-color: #4a7dff;
+      border-radius: 10px;
     }
 
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
+    canvas {
+      background: #f9fafb;
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgb(0 0 0 / 0.15);
+      margin-top: 28px;
+      width: 100% !important;
+      height: auto !important;
+      max-height: 320px;
+      user-select: none;
+    }
+
+    /* Responsividade para dispositivos móveis */
+    @media (max-width: 768px) {
+      #container {
+        padding: 25px 20px;
+      }
+      #search {
+        max-width: 100%;
+        gap: 12px;
+      }
+      #search input {
+        font-size: 16px;
+        padding: 12px 15px;
+        flex-grow: 1;
+        min-width: 0;
+      }
+      #search button {
+        padding: 12px 20px;
+        font-size: 16px;
+        min-width: 110px;
+      }
+      .weather-card {
+        flex: 1 1 140px;
+        min-width: 140px;
+        margin-top: 5px;
+        padding: 15px 20px;
+        font-size: 14px;
+      }
+      .weather-card img {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 8px;
+      }
+      .section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+      }
+      .scrollable {
+        max-height: 200px;
+      }
+      canvas {
+        max-height: 280px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #search {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #search input, #search button {
+        width: 100%;
+        min-width: 0;
+      }
+      #search button {
+        margin-top: 12px;
+        padding: 14px 0;
+      }
+      .weather-card {
+        flex: 1 1 100%;
+        min-width: 100%;
+        padding: 18px 20px;
+        font-size: 15px;
+      }
+      .scrollable {
+        max-height: 180px;
+      }
+      canvas {
+        max-height: 260px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <input id="cidade-input" type="text" placeholder="Ex: Recife" />
-    <button onclick="buscarTudo()">Buscar</button>
+  <div id="container">
+    <div id="search" role="search">
+      <input id="cidade-input" type="text" placeholder="Ex: Recife" aria-label="Digite o nome da cidade" />
+      <button onclick="buscarTudo()" aria-label="Buscar clima da cidade">Buscar</button>
+    </div>
 
-    <div id="resultado"></div>
+    <div id="resultado" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="section" aria-label="Gráfico de precipitação">
+      <h2>🌧 Precipitação nas próximas 12 horas</h2>
+      <canvas id="precipChart" width="600" height="300" role="img" aria-label="Gráfico de barras da precipitação horária"></canvas>
+      <div id="precipitation" class="flex-row" style="margin-top: 12px;" aria-live="polite" aria-atomic="true"></div>
+    </div>
   </div>
 
   <script>
     const chave = "c2e74e9ad5d910d7889b155c09a0d42d";
+    let precipChartInstance = null;
 
     async function buscarTudo() {
       const cidade = document.getElementById("cidade-input").value.trim();
@@ -131,13 +289,13 @@
         return;
       }
       const resultado = document.getElementById("resultado");
-      resultado.innerHTML = "<p>Carregando...</p>";
+      resultado.innerHTML = `<p style="text-align:center; font-weight:600;">Carregando dados...</p>`;
 
       try {
         const geoRes = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cidade)}&limit=1&appid=${chave}`);
         const geoData = await geoRes.json();
         if (!geoData.length) {
-          resultado.innerHTML = `<p>Cidade não encontrada.</p>`;
+          resultado.innerHTML = `<p style="text-align:center; font-weight:600; color:#ffcccb;">Cidade não encontrada.</p>`;
           return;
         }
         const { lat, lon, name, state, country } = geoData[0];
@@ -151,55 +309,65 @@
         const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${chave}`);
         const air = await airRes.json();
 
-        let html = `<div class="section">
-          <h2>Localização</h2>
-          <p><strong>${name}${state ? ", " + state : ""}, ${country}</strong></p>
-          <p>Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}</p>
-        </div>`;
-
-        html += `<div class="section">
-          <h2>Tempo Atual</h2>
-          <div class="flex-row">
-            <div class="weather-card">
-              <h3>${weather.weather[0].description}</h3>
-              <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png" alt="${weather.weather[0].description}" />
-            </div>
-            <div class="weather-card"><strong>Temperatura:</strong> ${Math.round(weather.main.temp)} °C</div>
-            <div class="weather-card"><strong>Sensação térmica:</strong> ${Math.round(weather.main.feels_like)} °C</div>
-            <div class="weather-card"><strong>Mínima:</strong> ${Math.round(weather.main.temp_min)} °C</div>
-            <div class="weather-card"><strong>Máxima:</strong> ${Math.round(weather.main.temp_max)} °C</div>
-            <div class="weather-card"><strong>Umidade:</strong> ${weather.main.humidity} %</div>
-            <div class="weather-card"><strong>Vento:</strong> ${Math.round(weather.wind.speed * 3.6)} km/h</div>
-            <div class="weather-card"><strong>Pressão:</strong> ${weather.main.pressure} hPa</div>
+        let html = `
+          <div class="section" aria-label="Informações de localização">
+            <h2>Localização</h2>
+            <p style="text-align:center; font-weight:700; font-size:1.25rem;">
+              ${name}${state ? ", " + state : ""}, ${country}
+            </p>
+            <p style="text-align:center; font-size:0.9rem; color:#cbd5e1;">
+              Latitude: ${lat.toFixed(4)} | Longitude: ${lon.toFixed(4)}
+            </p>
           </div>
-        </div>`;
+        `;
 
-        html += `<div class="section">
+        html += `
+          <div class="section" aria-label="Condições atuais do tempo">
+            <h2>Tempo Atual</h2>
+            <div class="flex-row" role="list">
+              <div class="weather-card" role="listitem" aria-label="Condição do tempo">
+                <h3 style="text-transform: capitalize;">${weather.weather[0].description}</h3>
+                <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png" alt="${weather.weather[0].description}" />
+              </div>
+              <div class="weather-card" role="listitem"><strong>Temperatura:</strong> ${Math.round(weather.main.temp)} °C</div>
+              <div class="weather-card" role="listitem"><strong>Sensação térmica:</strong> ${Math.round(weather.main.feels_like)} °C</div>
+              <div class="weather-card" role="listitem"><strong>Mínima:</strong> ${Math.round(weather.main.temp_min)} °C</div>
+              <div class="weather-card" role="listitem"><strong>Máxima:</strong> ${Math.round(weather.main.temp_max)} °C</div>
+              <div class="weather-card" role="listitem"><strong>Umidade:</strong> ${weather.main.humidity} %</div>
+              <div class="weather-card" role="listitem"><strong>Vento:</strong> ${Math.round(weather.wind.speed * 3.6)} km/h</div>
+              <div class="weather-card" role="listitem"><strong>Pressão:</strong> ${weather.main.pressure} hPa</div>
+            </div>
+          </div>
+        `;
+
+        html += `<div class="section" aria-label="Qualidade do Ar">
           <h2>Qualidade do Ar</h2>`;
+
         if (air.list && air.list.length > 0) {
           const a = air.list[0];
-          html += `<div class="flex-row">
-            <div class="weather-card"><strong>Índice AQI:</strong> ${a.main.aqi} (1-5)</div>
-            <div class="weather-card"><strong>CO:</strong> ${a.components.co} μg/m³</div>
-            <div class="weather-card"><strong>NO:</strong> ${a.components.no} μg/m³</div>
-            <div class="weather-card"><strong>NO₂:</strong> ${a.components.no2} μg/m³</div>
-            <div class="weather-card"><strong>O₃:</strong> ${a.components.o3} μg/m³</div>
-            <div class="weather-card"><strong>SO₂:</strong> ${a.components.so2} μg/m³</div>
-            <div class="weather-card"><strong>PM2.5:</strong> ${a.components.pm2_5} μg/m³</div>
-            <div class="weather-card"><strong>PM10:</strong> ${a.components.pm10} μg/m³</div>
+          html += `<div class="flex-row" role="list">
+            <div class="weather-card" role="listitem"><strong>Índice AQI:</strong> ${a.main.aqi} (1-5)</div>
+            <div class="weather-card" role="listitem"><strong>CO:</strong> ${a.components.co} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>NO:</strong> ${a.components.no} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>NO₂:</strong> ${a.components.no2} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>O₃:</strong> ${a.components.o3} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>SO₂:</strong> ${a.components.so2} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>PM2.5:</strong> ${a.components.pm2_5} μg/m³</div>
+            <div class="weather-card" role="listitem"><strong>PM10:</strong> ${a.components.pm10} μg/m³</div>
           </div>`;
         } else {
-          html += "<p>Dados de qualidade do ar não disponíveis.</p>";
+          html += `<p style="text-align:center; font-style: italic; color: #cbd5e1;">Dados de qualidade do ar não disponíveis.</p>`;
         }
         html += "</div>";
 
-        html += `<div class="section">
-          <h2> Media Proximos 5 Dias </h2>
-          <div class="scrollable">`;
+        html += `<div class="section" aria-label="Previsão para os próximos dias">
+          <h2>Previsão (próximas 15 leituras de 3 em 3 horas)</h2>
+          <div class="scrollable" role="list">`;
+
         const previsoes = forecast.list.slice(0, 15);
         for (const item of previsoes) {
           const dt = new Date(item.dt * 1000);
-          html += `<div class="weather-card">
+          html += `<div class="weather-card" role="listitem" style="text-align:center;">
             <strong>${dt.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</strong><br />
             <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" /><br />
             ${item.weather[0].description}<br />
@@ -212,9 +380,118 @@
         html += `</div></div>`;
 
         resultado.innerHTML = html;
+
+        // Gráfico de precipitação
+        const precipData = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=precipitation&timezone=auto`).then(res => res.json());
+        const times = precipData.hourly.time;
+        const precipitation = precipData.hourly.precipitation;
+        const container = document.getElementById("precipitation");
+        container.innerHTML = "";
+
+        const labels = [];
+        const values = [];
+        const barColors = [];
+
+        const maxPoints = Math.min(12, times.length);
+
+        for (let i = 0; i < maxPoints; i++) {
+          const timeStr = new Date(times[i]).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          const mm = precipitation[i];
+
+          const item = document.createElement("div");
+          item.className = "weather-card";
+          item.style.minWidth = "90px";
+          item.textContent = `🕒 ${timeStr} → 🌧️ ${mm} mm`;
+          container.appendChild(item);
+
+          labels.push(timeStr);
+          values.push(mm);
+
+          if (mm >= 2.0) {
+            barColors.push('#ff6f00'); // laranja forte
+          } else if (mm > 0.4) {
+            barColors.push('#facc15'); // amarelo vibrante
+          } else if (mm <= 0.2) {
+            barColors.push('#60a5fa'); // azul suave
+          } else {
+            barColors.push('#22c55e'); // verde vibrante
+          }
+        }
+
+        if (precipChartInstance) {
+          precipChartInstance.destroy();
+        }
+
+        const ctx = document.getElementById('precipChart').getContext('2d');
+        precipChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Precipitação (mm)',
+              data: values,
+              backgroundColor: barColors,
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 600,
+              easing: 'easeOutQuad',
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${ctx.raw} mm de chuva`
+                },
+                backgroundColor: '#1e293b',
+                titleColor: '#f0f4ff',
+                bodyColor: '#e0e7ff',
+                cornerRadius: 6,
+                padding: 10,
+                displayColors: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'mm de chuva',
+                  color: '#a5b4fc',
+                  font: { weight: '600' }
+                },
+                grid: {
+                  color: 'rgba(165,180,252,0.3)'
+                },
+                ticks: {
+                  color: '#cbd5e1'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Hora do dia',
+                  color: '#a5b4fc',
+                  font: { weight: '600' }
+                },
+                grid: {
+                  color: 'transparent'
+                },
+                ticks: {
+                  color: '#cbd5e1'
+                }
+              }
+            }
+          }
+        });
+
       } catch (e) {
         console.error(e);
-        resultado.innerHTML = `<p>Erro ao buscar dados. Tente novamente.</p>`;
+        resultado.innerHTML = `<p style="text-align:center; font-weight:600; color:#ffcccb;">Erro ao buscar dados. Tente novamente.</p>`;
       }
     }
   </script>
