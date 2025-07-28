@@ -3,85 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Search you City</title>
+  <title>Search your City</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Fundo com a imagem do wallpaper indicado */
+    * {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
       background-image: url("https://wallpapercave.com/wp/wp8324687.png");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      color: white;
-      padding: 20px;
-      margin: 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-    }
-    /* Caixa principal meio opaca */
-    .container {
-      background: rgba(0,0,0,0.6); /* preto com opacidade 60% */
-      max-width: 700px;
-      width: 100%;
-      border-radius: 10px;
       padding: 20px;
-      box-sizing: border-box;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      color: #fff;
     }
-    h1 {
-      margin-bottom: 20px;
-      text-align: center;
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      max-width: 800px;
+      width: 100%;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
     }
+
+    h1, h2, h3 {
+      color: #fff;
+    }
+
     input, button {
       font-size: 16px;
       padding: 10px;
-      border-radius: 5px;
+      border-radius: 10px;
       border: none;
       margin-bottom: 15px;
     }
+
     input {
-      width: 75%;
+      width: 70%;
       margin-right: 5px;
+      border: 1px solid #ccc;
     }
+
     button {
-      background-color: #2196f3;
+      background-color: #4a7dff;
       color: white;
+      margin-left: 5%;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button:hover {
-      background-color: #1976d2;
+      background-color: #375edc;
     }
+
     .section {
       margin-bottom: 25px;
     }
+
     .section h2 {
-      border-bottom: 1px solid #555;
+      border-bottom: 1px solid #ccc;
       padding-bottom: 5px;
       margin-bottom: 10px;
+      color: #ffe;
     }
+
     .flex-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
+
     .weather-card {
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px;
-      flex: 1 1 120px;
-      box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 15px;
+      flex: 1 1 140px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      color: #fff;
+      backdrop-filter: blur(4px);
     }
+
     .weather-card img {
       width: 50px;
       height: 50px;
+      display: block;
+      margin-bottom: 10px;
     }
+
     .scrollable {
       max-height: 250px;
       overflow-y: auto;
+      padding-right: 10px;
     }
+
     pre {
       white-space: pre-wrap;
       word-wrap: break-word;
@@ -109,7 +134,6 @@
       resultado.innerHTML = "<p>Carregando...</p>";
 
       try {
-        // 1. Geocoding - pega lat/lon da cidade
         const geoRes = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cidade)}&limit=1&appid=${chave}`);
         const geoData = await geoRes.json();
         if (!geoData.length) {
@@ -118,19 +142,15 @@
         }
         const { lat, lon, name, state, country } = geoData[0];
 
-        // 2. Dados atuais (/weather)
         const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${chave}&units=metric&lang=pt_br`);
         const weather = await weatherRes.json();
 
-        // 3. Previsão 5 dias / 3h (/forecast)
         const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${chave}&units=metric&lang=pt_br`);
         const forecast = await forecastRes.json();
 
-        // 4. Qualidade do ar (/air_pollution)
         const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${chave}`);
         const air = await airRes.json();
 
-        // Montar HTML
         let html = `<div class="section">
           <h2>Localização</h2>
           <p><strong>${name}${state ? ", " + state : ""}, ${country}</strong></p>
@@ -173,17 +193,15 @@
         }
         html += "</div>";
 
-        // Forecast: mostrar 5 primeiros horários da previsão
         html += `<div class="section">
-          <h2>Previsão para 5 dias (3 em 3 horas)</h2>
+          <h2> Media Proximos 5 Dias </h2>
           <div class="scrollable">`;
         const previsoes = forecast.list.slice(0, 15);
         for (const item of previsoes) {
           const dt = new Date(item.dt * 1000);
-          html += `<div class="weather-card" style="margin-bottom:10px;">
+          html += `<div class="weather-card">
             <strong>${dt.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</strong><br />
-            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" />
-            <br />
+            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" /><br />
             ${item.weather[0].description}<br />
             Temp: ${Math.round(item.main.temp)} °C<br />
             Sensação: ${Math.round(item.main.feels_like)} °C<br />
