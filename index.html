@@ -16,9 +16,10 @@
     }
     body {
       background-image: url('./paisagem-natural.png');
-      background-size: cover;       /* cobre toda a tela */
-      background-position: center;  /* centraliza a imagem */
-      background-repeat: no-repeat; /* não repete */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;  /* imagem fixa */
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -29,6 +30,7 @@
       -moz-osx-font-smoothing: grayscale;
       overflow-y: scroll;
     }
+
 
 
     #container {
@@ -399,9 +401,6 @@
           const mm = precipitation[i];
 
           const item = document.createElement("div");
-          item.className = "weather-card";
-          item.style.minWidth = "90px";
-          item.textContent = `🕒 ${timeStr} → 🌧️ ${mm} mm`;
           container.appendChild(item);
 
           labels.push(timeStr);
@@ -409,11 +408,9 @@
 
           if (mm >= 2.0) {
             barColors.push('#ff6f00'); // laranja forte
-          } else if (mm > 0.4) {
+          } else if (mm >= 0.4) {
             barColors.push('#facc15'); // amarelo vibrante
           } else if (mm <= 0.2) {
-            barColors.push('#60a5fa'); // azul suave
-          } else {
             barColors.push('#22c55e'); // verde vibrante
           }
         }
