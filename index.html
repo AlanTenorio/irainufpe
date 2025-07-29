@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Reset e fonte */
+
     * {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -19,7 +19,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-attachment: fixed;  /* imagem fixa */
+      background-attachment: fixed; 
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -192,7 +192,7 @@
       user-select: none;
     }
 
-    /* Responsividade para dispositivos móveis */
+
     @media (max-width: 768px) {
       #container {
         padding: 25px 20px;
@@ -410,11 +410,11 @@
           values.push(mm);
 
           if (mm >= 2.0) {
-            barColors.push('#ff6f00'); // laranja forte
+            barColors.push('#ff6f00');
           } else if (mm >= 0.4) {
-            barColors.push('#facc15'); // amarelo vibrante
+            barColors.push('#facc15'); 
           } else if (mm <= 0.2) {
-            barColors.push('#22c55e'); // verde vibrante
+            barColors.push('#22c55e');
           }
         }
 
